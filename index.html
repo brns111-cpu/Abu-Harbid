@@ -8,6 +8,7 @@
     <link rel="apple-touch-icon" href="icon-192.png">
     <title>شجرة عائلة أبوهربيد</title>
     <meta name="mobile-web-app-capable" content="yes">
+    <link rel="manifest" href='data:application/manifest+json,{"name":"Abu Harbid Family Tree","short_name":"ABH","start_url":".","display":"standalone","background_color":"%23f8f9fa","theme_color":"%231b4332"}'>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
@@ -22,7 +23,7 @@
             --danger-color: #c92a2a;
         }
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Cairo', sans-serif; }
-        body { background-color: var(--bg-color); color: var(--text-color); line-height: 1.6; padding-bottom: 70px; direction: rtl; }
+        body { background-color: var(--bg-color); color: var(--text-color); line-height: 1.6; padding-bottom: 70px; }
         header { background: linear-gradient(135deg, var(--primary-color), var(--secondary-color)); color: white; padding: 16px; text-align: center; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
         header h1 { font-size: 1.4rem; margin-bottom: 3px; }
         header p { font-size: 0.85rem; opacity: 0.9; }
@@ -30,11 +31,6 @@
         .session-bar .role-badge { background: var(--accent-color); color: #212529; padding: 2px 10px; border-radius: 12px; font-weight: 700; font-size: 0.75rem; }
         .session-bar button { background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.4); color: white; padding: 3px 12px; border-radius: 12px; font-size: 0.75rem; cursor: pointer; }
         .container { padding: 12px; max-width: 900px; margin: auto; }
-        
-        /* شريط التنبيهات العصري */
-        .notification-banner { background: #e9ecef; border-right: 4px solid var(--accent-color); padding: 10px 15px; margin-bottom: 15px; border-radius: 4px; font-size: 13px; display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap; }
-        .btn-subscribe { background: var(--secondary-color); color: white; border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-family: 'Cairo', sans-serif; font-size: 0.8rem; }
-
         .nav-tabs { display: flex; overflow-x: auto; gap: 8px; padding: 10px 0; background: white; white-space: nowrap; border-bottom: 2px solid var(--border-color); margin-bottom: 15px; }
         .nav-tab { background: #e9ecef; border: none; padding: 8px 15px; border-radius: 20px; font-size: 0.85rem; cursor: pointer; transition: 0.3s; font-weight: 600; }
         .nav-tab.active { background: var(--primary-color); color: white; }
@@ -56,11 +52,8 @@
         .notice { background: #fff8e6; border: 1px solid var(--accent-color); border-radius: 8px; padding: 10px; font-size: 0.8rem; margin-bottom: 12px; }
         .notice-danger { background: #fdecea; border-color: var(--danger-color); }
         
-        /* شجرة النسب العرضية */
-        .tree-scroll { overflow-x: auto; overflow-y: auto; padding: 15px 5px 25px; touch-action: pan-x pan-y; -webkit-overflow-scrolling: touch; }
-        .zoom-bar { display: flex; gap: 6px; align-items: center; margin-bottom: 6px; }
-        .zoom-bar button { min-width: 36px; height: 34px; border: none; border-radius: 8px; background: var(--secondary-color); color: #fff; font-size: 1.1rem; cursor: pointer; }
-        .zoom-bar button.fit { padding: 0 12px; font-size: .8rem; }
+        /* ====== شجرة النسب العرضية ====== */
+        .tree-scroll { overflow-x: auto; overflow-y: hidden; padding: 15px 5px 25px; -webkit-overflow-scrolling: touch; }
         .tree-h { direction: rtl; display: inline-block; min-width: 100%; }
         .tree-h ul { display: flex; justify-content: center; padding-top: 30px; position: relative; margin: 0; }
         .tree-h li { list-style: none; position: relative; padding: 30px 6px 0; display: flex; flex-direction: column; align-items: center; text-align: center; }
@@ -76,19 +69,81 @@
         .tree-node.root-node { background: var(--primary-color); color: white; font-size: 0.95rem; }
         .tree-node .dead-mark { color: var(--danger-color); font-size: 0.75rem; }
         .mini-btn { background: var(--accent-color); color: #212529; border: none; padding: 3px 10px; border-radius: 12px; font-size: 0.7rem; font-weight: 700; cursor: pointer; margin-top: 6px; }
+        .inline-form { background: #fdf6ec; border: 1.5px dashed var(--accent-color); border-radius: 10px; padding: 8px; margin-top: 8px; width: 185px; text-align: right; }
+        .inline-form input, .inline-form select { width: 100%; padding: 6px; margin-bottom: 5px; font-size: 0.75rem; border: 1px solid var(--border-color); border-radius: 6px; }
+        .inline-form .mini-btn { width: 100%; margin-top: 0; }
         .tree-hint { font-size: 0.78rem; color: #666; margin-bottom: 8px; }
+        
+        /* ====== نافذة التفاصيل المنبثقة ====== */
+        .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 1500; align-items: center; justify-content: center; padding: 15px; }
+        .modal-overlay.show { display: flex; }
+        .modal-box { background: white; border-radius: 14px; padding: 20px; max-width: 420px; width: 100%; max-height: 88vh; overflow-y: auto; }
+        .modal-box h3 { color: var(--primary-color); margin-bottom: 12px; }
 
-        /* شاشة الدخول */
+        /* ====== شاشة الدخول ====== */
         .login-overlay { position: fixed; inset: 0; background: linear-gradient(135deg, var(--primary-color), var(--secondary-color)); z-index: 2000; display: flex; align-items: center; justify-content: center; padding: 18px; }
         .login-card { background: white; border-radius: 16px; padding: 24px; max-width: 400px; width: 100%; box-shadow: 0 10px 40px rgba(0,0,0,0.3); }
         .login-card h2 { border: none; text-align: center; }
         .login-card .btn { margin-top: 6px; }
 
-        /* زر الواتساب العائم الثابت */
+        /* ====== أزرار الطباعة ====== */
+        .print-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px; }
+        .print-card { background: #f0f7f4; border: 1.5px solid var(--secondary-color); border-radius: 12px; padding: 14px 10px; text-align: center; cursor: pointer; transition: 0.2s; }
+        .print-card:hover { background: var(--secondary-color); color: white; }
+        .print-card i { font-size: 1.4rem; display: block; margin-bottom: 6px; }
+        .print-card span { font-size: 0.82rem; font-weight: 700; }
+
+        /* ====== منطقة الطباعة ====== */
+        #printArea { display: none; }
+        .p-head { text-align: center; margin-bottom: 15px; }
+        .p-head h1 { font-size: 1.3rem; color: #000; }
+        .p-head h2 { font-size: 1.05rem; border: none; color: #000; margin: 4px 0; }
+        .p-head p { font-size: 0.8rem; color: #333; }
+        @media print {
+            body * { visibility: hidden !important; }
+            #printArea, #printArea * { visibility: visible !important; }
+            #printArea { display: block !important; position: absolute; top: 0; right: 0; left: 0; width: 100%; }
+            #printArea table { width: 100%; font-size: 0.85rem; }
+            #printArea th, #printArea td { border: 1px solid #000; padding: 6px; }
+            #printArea th { background: #eee !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+            .print-footer-fixed { position: fixed; bottom: 0; right: 0; left: 0; text-align: center; font-size: 0.75rem; border-top: 1.5px solid #000; padding-top: 6px; background: white; }
+        }
+        .print-footer-fixed { display: none; }
+
+        /* زر الواتساب العائم الثابت في زاوية الشاشة */
         .whatsapp-float { position: fixed; bottom: 20px; left: 20px; background-color: #25d366; color: white; width: 55px; height: 55px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 28px; box-shadow: 0 4px 10px rgba(0,0,0,0.3); z-index: 9999; text-decoration: none; transition: transform 0.2s; }
         .whatsapp-float:hover { transform: scale(1.1); }
 
-        .avatar { width: 46px; height: 46px; border-radius: 50%; object-fit: cover; display: block; margin: 0 auto 4px; border: 2px solid #fff; }
+        .admin-badge { background: #ff6b6b; color: white; padding: 2px 6px; border-radius: 4px; font-size: 0.7rem; }
+        .guide-img-wrap { position: relative; margin: 12px 0; border: 1px solid var(--border-color); border-radius: 10px; overflow: hidden; }
+        .guide-img-wrap img { width: 100%; display: block; }
+        .guide-step { display: flex; gap: 10px; margin-bottom: 12px; align-items: flex-start; }
+        .guide-step .num { background: var(--secondary-color); color: white; min-width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.85rem; }
+        .guide-step p { font-size: 0.85rem; }
+        .apk-box { background: #eef6ff; border: 1px solid #74a8e0; border-radius: 10px; padding: 12px; margin: 12px 0; font-size: 0.85rem; }
+        .sync-box { background: #f4eefb; border: 1px solid #9a6fc4; border-radius: 10px; padding: 12px; margin: 12px 0; font-size: 0.85rem; }
+
+        .tree-scroll{overflow-y:auto;touch-action:pan-x pan-y}
+        .zoom-bar{display:flex;gap:6px;align-items:center;margin-bottom:6px}
+        .zoom-bar button{min-width:36px;height:34px;border:none;border-radius:8px;background:var(--secondary-color);color:#fff;font-size:1.1rem;cursor:pointer}
+        .zoom-bar button.fit{padding:0 12px;font-size:.8rem}
+        .mod-card{border:1px solid var(--border-color);border-radius:10px;padding:10px;margin-top:8px;font-size:.85rem}
+        .mod-tag{background:var(--accent-color);padding:1px 8px;border-radius:10px;font-size:.72rem;font-weight:700}
+        #printArea.show{display:block;position:fixed;inset:0;background:#fff;z-index:3000;overflow:auto;padding:12px}
+        .print-toolbar{display:flex;gap:8px;align-items:center;flex-wrap:wrap;position:sticky;top:0;background:#fff;padding:8px 0;border-bottom:1px solid #ddd;margin-bottom:10px}
+        .print-toolbar .btn{width:auto;margin:0;padding:8px 16px}
+        .print-toolbar small{color:#666;font-size:.72rem}
+        #printArea.show .print-footer-fixed{display:block;position:static;margin-top:15px}
+        @media print{
+         .print-toolbar{display:none !important}
+         #printArea.show{position:absolute !important;bottom:auto !important;height:auto !important;overflow:visible !important;padding:0 !important}
+         #printArea .print-footer-fixed{display:block !important;position:fixed !important;bottom:0;right:0;left:0}
+        }
+        .by{font-size:.72rem;font-weight:400;opacity:.85}
+        .avatar{width:46px;height:46px;border-radius:50%;object-fit:cover;display:block;margin:0 auto 4px;border:2px solid #fff}
+        .avatar.s{width:30px;height:30px;display:inline-block;margin:0 0 0 6px;vertical-align:middle;border:1px solid var(--border-color)}
+        .avatar.big{width:96px;height:96px;margin:0 auto 8px}
+        .mod-img{max-width:100%;max-height:240px;border-radius:10px;margin-top:6px;display:block}
     </style>
 </head>
 <body>
@@ -97,7 +152,7 @@
     <div class="login-overlay" id="loginOverlay">
         <div class="login-card">
             <h2><i class="fa fa-tree"></i> شجرة عائلة أبوهربيد</h2>
-            <p style="text-align:center; font-size:0.8rem; margin-bottom:12px;">تصميم: سائد أبوهربيد</p>
+            <p style="text-align:center; font-size:0.8rem; margin-bottom:12px;">تصميم: saedmanar</p>
             <div class="form-group">
                 <label>نوع الدخول</label>
                 <select id="loginRole" onchange="loginRoleChanged()">
@@ -133,13 +188,6 @@
     </div>
 
     <div class="container">
-
-        <!-- شريط تفعيل الإشعارات العصرية -->
-        <div class="notification-banner">
-            <span>🔔 فعّل التنبيهات الفورية لتصلك أحدث أخبار ومناسبات العائلة وأقسامها فوراً.</span>
-            <button class="btn-subscribe" onclick="requestNotificationPermission()">تفعيل التنبيهات</button>
-        </div>
-
         <div class="nav-tabs">
             <button class="nav-tab active" onclick="switchTab('tree')">شجرة النسب</button>
             <button class="nav-tab" onclick="switchTab('members')">الأفراد</button>
@@ -150,14 +198,15 @@
             <button class="nav-tab" onclick="switchTab('news')">المناسبات والأخبار</button>
             <button class="nav-tab" onclick="switchTab('reform')">الإصلاح والوساطة</button>
             <button class="nav-tab" onclick="switchTab('skills')">دليل الأفراد والمهارات</button>
-            <button class="nav-tab" id="tab-admin-log" onclick="switchTab('admin-log')">سجل التعديلات</button>
+            <button class="nav-tab" id="tab-admin-log" onclick="switchTab('admin-log')">سجل التعديلات (مشرفين)</button>
             <button class="nav-tab" onclick="switchTab('guide')">دليل الاستخدام</button>
+            <button class="nav-tab" id="tab-backup" onclick="switchTab('backup')">النسخ الاحتياطي</button>
         </div>
 
         <!-- 1. شجرة النسب -->
         <div id="tree" class="section-content active">
             <h2>شجرة النسب الأساسية</h2>
-            <div class="tree-hint"><i class="fa fa-hand-pointer"></i> اضغط على أي اسم في الشجرة لعرض بياناته وتعديلها.</div>
+            <div class="tree-hint"><i class="fa fa-hand-pointer"></i> اضغط على أي اسم في الشجرة لعرض بياناته وتعديلها. يمكن للإداريين إضافة ابن تحت أي أب مباشرة من الشجرة. اسحب الشجرة للتنقل، واستخدم أزرار التكبير/التصغير أو اقرص بإصبعين.</div>
             <div class="zoom-bar"><button onclick="zoomBy(0.15)">＋</button><button onclick="zoomBy(-0.15)">－</button><button class="fit" onclick="zoomFit()">ملاءمة</button><button class="fit" onclick="setZoom(1)">100%</button><span id="zoomLbl" style="font-size:.8rem">100%</span></div>
             <div class="tree-scroll">
                 <div class="tree-h" id="treeContainer"></div>
@@ -169,54 +218,120 @@
             <h2>إدارة وتسجيل الأفراد والأبناء</h2>
             <div class="form-group">
                 <label>بحث عن فرد (بالاسم أو رقم الهوية أو الكود)</label>
-                <input type="text" id="memberSearch" placeholder="اكتب هنا للبحث...">
+                <input type="text" id="memberSearch" oninput="renderMembers()" placeholder="اكتب هنا للبحث...">
+            </div>
+            <div id="memberFormWrap" style="display:none;">
+                <h3 style="font-size:1rem; color:var(--secondary-color); margin-bottom:8px;" id="memberFormTitle">تسجيل فرد جديد</h3>
+                <input type="hidden" id="mEditId">
+                <div class="form-row">
+                    <div class="form-group"><label>طريقة الإدخال</label><select id="mMode" onchange="modeChanged()"><option value="auto">تلقائي — الاسم الأول فقط + أبوهربيد (فرع محمد)</option><option value="manual">يدوي — الاسم كاملاً (فرع صالح)</option></select></div>
+                    <div class="form-group"><label id="mNameLbl">الاسم</label><input type="text" id="mFullName"></div>
+                    <div class="form-group"><label>النوع</label><select id="mGender" onchange="genderChanged()"><option value="ذكر">ذكر</option><option value="أنثى">أنثى</option></select></div>
+                    <div class="form-group"><label>رقم الهوية</label><input type="text" id="mIdNumber"></div>
+                    <div class="form-group"><label>رقم الجوال</label><input type="text" id="mPhone"></div>
+                    <div class="form-group"><label>سنة الميلاد (4 أرقام)</label><input type="number" id="mBirth" min="1800" max="2100"></div>
+                    <div class="form-group"><label>صورة الملف الشخصي (اختيارية)</label><input type="file" accept="image/*" id="mPhotoFile" onchange="pickPhoto(this,240,setPhoto)"><input type="hidden" id="mPhotoData"><img id="mPhotoPrev" class="avatar" style="display:none;margin-top:8px"><button type="button" class="mini-btn" style="margin-top:6px" onclick="clearPhoto()">إزالة الصورة</button></div>
+                    <div class="form-group"><label>الحالة (أحياء / أموات)</label><select id="mStatus"><option value="حي">حي</option><option value="متوفى">متوفى</option></select></div>
+                    <div class="form-group"><label>عدد أفراد الأسرة</label><input type="number" id="mFamilySize" min="0" value="0"></div>
+                    <div class="form-group"><label>الأب (اختياري - لربط الابن بوالده)</label><select id="mParent" onchange="parentChanged()"><option value="">— بدون (فرد جذري) —</option></select></div>
+                    <div class="form-group" id="gHusband"><label>اسم زوجها الثلاثي (للنساء)</label><input type="text" id="mHusbandName"></div>
+                    <div class="form-group" id="gWife"><label>اسم الزوجة (الرباعي)</label><input type="text" id="mWife"></div>
+                    <div class="form-group" id="gCode" style="display:none"><label>الكود (للمدير فقط)</label><input type="text" id="mCode" style="direction:ltr"></div>
+                    <div class="form-group" id="gWifeId"><label>رقم هوية الزوجة</label><input type="text" id="mWifeId"></div>
+                </div>
+                <button class="btn" onclick="saveMember()"><i class="fa fa-floppy-disk"></i> <span id="memberFormBtnTxt">حفظ الفرد</span></button>
+                <button class="btn btn-danger" onclick="cancelMemberForm()" style="background:#6c757d;">إلغاء</button>
+            </div>
+            <button class="btn no-edit" id="addMemberBtn" onclick="showMemberForm()"><i class="fa fa-user-plus"></i> تسجيل فرد جديد</button>
+            <div class="table-container">
+                <table>
+                    <thead><tr><th>الاسم</th><th>النوع</th><th>رقم الهوية</th><th>الحالة</th><th>سنة الميلاد</th><th>الجوال</th><th>أفراد الأسرة</th><th>الأب</th><th>الكود</th><th>إجراءات</th></tr></thead>
+                    <tbody id="membersTableBody"></tbody>
+                </table>
             </div>
         </div>
 
         <!-- 3. الطباعة والكشوفات -->
         <div id="printing" class="section-content">
             <h2>الطباعة والكشوفات المستقلة</h2>
+            <div class="notice">اضغط على الكشف المطلوب فقط، وسيتم طباعة <b>هذا الكشف وحده</b> دون باقي الكشوفات أو محتوى التطبيق.</div>
+            <div class="print-grid">
+                <div class="print-card" onclick="printReport('men')"><i class="fa fa-mars"></i><span>كشف الرجال</span></div>
+                <div class="print-card" onclick="printReport('women')"><i class="fa fa-venus"></i><span>كشف النساء</span></div>
+                <div class="print-card" onclick="printReport('living')"><i class="fa fa-heart-pulse"></i><span>كشف الأحياء</span></div>
+                <div class="print-card" onclick="printReport('dead')"><i class="fa fa-ribbon"></i><span>كشف الأموات</span></div>
+                <div class="print-card" onclick="printReport('tree')"><i class="fa fa-tree"></i><span>شجرة النسب</span></div>
+                <div class="print-card" onclick="printReport('all')"><i class="fa fa-list"></i><span>الكشف الشامل</span></div>
+            </div>
         </div>
 
         <!-- 4. أكواد الأعضاء -->
         <div id="codes" class="section-content">
             <h2>أكواد الأعضاء الخاصة</h2>
+            <div class="notice">يولَّد لكل فرد مسجَّل كود فريد لا يتكرر. يظهر الكود للمصمم والمشرفين فقط؛ وعندما يطلب المستخدم كوده يُسلَّم له من المصمم أو المشرف المخوّل.</div>
+            <button class="btn no-edit" onclick="regenAllCodes()" style="background:#6c757d;"><i class="fa fa-rotate"></i> توليد أكواد لمن لا يملك كوداً</button>
+            <div class="table-container">
+                <table>
+                    <thead><tr><th>الاسم</th><th>الكود الخاص</th><th>إجراء</th></tr></thead>
+                    <tbody id="codesTableBody"></tbody>
+                </table>
+            </div>
         </div>
 
-        <!-- 5. الأقسام الأربعة الأساسية -->
         <div id="family-council" class="section-content">
             <h2>مجلس العائلة</h2>
             <p style="margin-bottom:10px;font-size:.85rem">مخصص لإعلانات القرارات والاجتماعات العائلية.</p>
+            <div id="mod-council"></div>
         </div>
 
         <div id="news" class="section-content">
             <h2>المناسبات والأخبار</h2>
             <p style="margin-bottom:10px;font-size:.85rem">أبرز أخبار الأفراح والأتراح والمناسبات الخاصة بعائلة أبوهربيد.</p>
+            <div id="mod-news"></div>
         </div>
 
         <div id="reform" class="section-content">
             <h2>لجنة الإصلاح والوساطة</h2>
-            <p style="margin-bottom:10px;font-size:.85rem">لجنة مجتمعية لفض المنازعات وتعزيز أواصر المحبة والصلح.</p>
+            <p style="margin-bottom:10px;font-size:.85rem">لجنة مجتمعية لفض المنازعات وتعزيز أواصر المحبة والصلح بين أبناء العائلة. (السجل يظهر للمشرفين فقط)</p>
+            <div id="mod-reform"></div>
         </div>
 
         <div id="skills" class="section-content">
             <h2>دليل الأفراد والمهارات</h2>
-            <p style="margin-bottom:10px;font-size:.85rem">استعراض تخصصات وخبرات ومهارات أبناء العائلة.</p>
+            <p style="margin-bottom:10px;font-size:.85rem">استعراض تخصصات وخبرات ومهارات أبناء العائلة لتعزيز التعاون المشترك.</p>
+            <div id="mod-skills"></div><datalist id="dl-members"></datalist>
         </div>
 
-        <!-- 6. المشرفون -->
         <div id="admins" class="section-content">
-            <h2>إدارة المشرفين</h2>
+            <h2>إدارة المشرفين (للمدير فقط)</h2>
+            <div class="notice">المشرف يستطيع: إضافة الأفراد والأبناء، إدخال سجلات الأقسام، فرز الأكواد. <b>لا يستطيع التعديل ولا الحذف ولا الطباعة</b> — هذه للمدير فقط. المشرف يغيّر كلمته بنفسه من رابط «نسيت كلمة المرور» في شاشة الدخول، وحذفه يلغي صلاحياته فوراً.</div>
+            <div class="form-group"><label>كلمة مرور المدير الجديدة (6 أحرف فأكثر)</label><input type="text" id="mgrPass"></div>
+            <button class="btn" onclick="setMgrPass()">تغيير كلمة مرور المدير</button>
+            <hr style="margin:14px 0">
+            <div class="form-group"><label>اسم المشرف</label><input type="text" id="admName"></div><div class="form-group"><label>بريد المشرف</label><input type="email" id="admEmail" style="direction:ltr"></div><div class="form-group"><label>كلمة المرور (6 أحرف فأكثر)</label><input type="text" id="admPass"></div>
+            <button class="btn" onclick="addAdmin()">＋ إضافة مشرف</button>
+            <div class="table-container"><table><thead><tr><th>المشرف</th><th>إجراء</th></tr></thead><tbody id="adminsBody"></tbody></table></div>
         </div>
 
-        <!-- 7. سجل التعديلات -->
+        <!-- 9. سجل تعديلات المشرفين -->
         <div id="admin-log" class="section-content">
-            <h2>سجل التعديلات</h2>
+            <h2>سجل التعديلات (خاص بالمشرفين والمصمم فقط)</h2>
+            <div class="notice notice-danger">هذا السجل <b>لا يظهر أبداً</b> في أي كشف مطبوع أو واجهة عامة، وهو مخزَّن بشكل منفصل عن بيانات الكشوفات.</div>
+            <div class="table-container">
+                <table>
+                    <thead><tr><th>اسم المشرف</th><th>نوع العملية</th><th>التفاصيل</th><th>التاريخ والوقت</th></tr></thead>
+                    <tbody id="logTableBody"></tbody>
+                </table>
+            </div>
         </div>
 
-        <!-- 8. دليل الاستخدام -->
+        <!-- 10. دليل الاستخدام -->
         <div id="guide" class="section-content">
-            <h2>دليل استخدام التطبيق</h2>
+            <h2>دليل استخدام التطبيق المبسط (مصور)</h2>
+            <div class="guide-step"><div class="num">1</div><p><b>الدخول:</b> عند فتح التطبيق تظهر شاشة الدخول. اختر نوع الدخول: "مستخدم عادي" للمشاهدة فقط، أو "مشرف/مصمم" بكلمة المرور للتعديل.</p></div>
+            <div class="guide-img-wrap">
+                <img src="data:image/png;base64,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"></div>
+            <div class="guide-step"><div class="num">2</div><p><b>التعديل:</b> المشرفون والمصمم يستطيعون إضافة الأفراد، إدارة الأقسام وتعديلها بسهولة.</p></div>
         </div>
     </div>
 
@@ -229,31 +344,6 @@
     </a>
 
     <script>
-        // دالة تبديل التبويبات الأساسية
-        function switchTab(tabId) {
-            document.querySelectorAll('.section-content').forEach(el => el.classList.remove('active'));
-            document.querySelectorAll('.nav-tab').forEach(el => el.classList.remove('active'));
-            document.getElementById(tabId).classList.add('active');
-            event.currentTarget.classList.add('active');
-        }
-
-        // تفاعل شاشة تسجيل الدخول والصلاحيات
-        function loginRoleChanged() {
-            const role = document.getElementById('loginRole').value;
-            document.getElementById('memberGroup').style.display = role === 'member' ? 'block' : 'none';
-            document.getElementById('adminNameGroup').style.display = role !== 'member' ? 'block' : 'none';
-            document.getElementById('passGroup').style.display = role !== 'member' ? 'block' : 'none';
-        }
-
-        function doLogin() {
-            document.getElementById('loginOverlay').style.display = 'none';
-            document.getElementById('sessionInfo').innerHTML = 'تم تسجيل الدخول بنجاح';
-        }
-
-        function logout() {
-            document.getElementById('loginOverlay').style.display = 'flex';
-        }
-
         // تفعيل نظام الإشعارات العصرية (Push Notifications)
         function requestNotificationPermission() {
             if (!("Notification" in window)) {
