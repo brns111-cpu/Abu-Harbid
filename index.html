@@ -1,29 +1,24 @@
-<!DOCTYPE html>
-<html lang="ar" dir="rtl">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="manifest" href="manifest.webmanifest">
-    <meta name="theme-color" content="#1b4332">
-    <link rel="apple-touch-icon" href="icon-192.png">
-    <title>شجرة عائلة أبوهربيد</title>
-    <meta name="theme-color" content="#1b4332">
-    <meta name="mobile-web-app-capable" content="yes">
-    <link rel="manifest" href='data:application/manifest+json,{"name":"Abu Harbid Family Tree","short_name":"ABH","start_url":".","display":"standalone","background_color":"%23f8f9fa","theme_color":"%231b4332"}'>
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>
-        :root {
-            --primary-color: #1b4332;
-            --secondary-color: #2d6a4f;
-            --accent-color: #d4a373;
-            --bg-color: #f8f9fa;
-            --card-bg: #ffffff;
-            --text-color: #212529;
-            --border-color: #dee2e6;
-            --danger-color: #c92a2a;
-        }
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Cairo', sans-serif; }
-        body { background-color: var(--bg-color); color: var(--text-color); line-height: 1.6; padding-bottom: 70px; }
-        header { background: linear-gradient(135deg, var(--primary-color), var(--secondary-color)); color: white; padding: 16px; text-align: center; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
-        header h1 { font-size: 1.4rem; margin-bottom: 3px; }
+        <button onclick="logout()"><i class="fa fa-right-from-bracket"></i> خروج</button>
+    </div>
+
+    <div class="container">
+        <div class="nav-tabs">
+            <button class="nav-tab active" onclick="switchTab('tree')">شجرة النسب</button>
+            <button class="nav-tab" onclick="switchTab('members')">الأفراد</button>
+            <button class="nav-tab" id="tab-printing" onclick="switchTab('printing')">الطباعة والكشوفات</button>
+            <button class="nav-tab" id="tab-codes" onclick="switchTab('codes')">أكواد الأعضاء</button>
+            <button class="nav-tab" id="tab-admins" onclick="switchTab('admins')">المشرفون</button>
+            <button class="nav-tab" onclick="switchTab('family-council')">مجلس العائلة</button>
+            <button class="nav-tab" onclick="switchTab('news')">المناسبات والأخبار</button>
+            <button class="nav-tab" onclick="switchTab('reform')">الإصلاح والوساطة</button>
+            <button class="nav-tab" onclick="switchTab('skills')">دليل الأفراد والمهارات</button>
+            <button class="nav-tab" id="tab-admin-log" onclick="switchTab('admin-log')">سجل التعديلات (مشرفين)</button>
+            <button class="nav-tab" onclick="switchTab('guide')">دليل الاستخدام</button>
+            <button class="nav-tab" id="tab-backup" onclick="switchTab('backup')">النسخ الاحتياطي</button>
+        </div>
+
+        <!-- 1. شجرة النسب (عرضية مع إدخال يدوي) -->
+        <div id="tree" class="section-content active">
+            <h2>شجرة النسب الأساسية</h2>
+            <div class="tree-hint"><i class="fa fa-hand-pointer"></i> اضغط على أي اسم في الشجرة لعرض بياناته وتعديلها. يمكن للإداريين إضافة ابن تحت أي أب مباشرة من الشجرة. اسحب الشجرة للتنقل، واستخدم أزرار التكبير/التصغير أو اقرص بإصبعين.</div>
+            <div class="zoom-bar"><button onclick="zoomBy(0.15)">＋</button><button onclick="zoomBy(-0.15)">－</button><button class="fit" onclick="zoomFit()">ملاءمة</button><button class="fit" onclick="setZoom(1)">100%</button><button class="fit" onclick="expandAll(true)">فتح الكل</button><button class="fit" onclick="expandAll(false)">طي الكل</button><span id="zoomLbl" style="font-size:.8rem">100%</span></div>
